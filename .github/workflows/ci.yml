@@ -69,3 +69,38 @@ jobs:
       - name: Fuzz batch
         run: cargo +nightly fuzz run batch -- -max_total_time=60
         working-directory: contracts/carbon_credit
+
+  # Issue #121: lint, type-check, and test the oracle-bridge Python package.
+  # Ruff/mypy configuration lives in oracle-bridge/pyproject.toml so existing
+  # Python sources do not need a cleanup pass for this job to stay green.
+  oracle-bridge:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: oracle-bridge
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: oracle-bridge/pyproject.toml
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: ruff check
+        run: ruff check .
+
+      - name: ruff format
+        run: ruff format --check .
+
+      - name: mypy
+        run: mypy oracle_bridge
+
+      - name: pytest
+        run: pytest tests/
