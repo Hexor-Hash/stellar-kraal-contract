@@ -549,7 +549,7 @@ describe('Health endpoint', () => {
   });
 
   test('reports correct pending count after indexing events', async () => {
-    const { app, store, rpc, indexer } = makeTestEnv();
+    const { app, rpc, indexer } = makeTestEnv();
 
     // Register two webhooks
     await request(app).post('/webhooks').send({ url: 'https://a.com', eventType: 'listing_created' });
